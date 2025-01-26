@@ -1,0 +1,287 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace Ergasia_Allilepidrasi
+{
+    public partial class Form2 : Form
+    {
+        private string selectedMeal;
+        private string selectedFood;
+        private string selectedDrink;
+        private string selectedCoffee;
+        private string orderStatus = "In Progress";
+        private Form1 parentForm;
+        int bill = 0;
+        public Form2(Form1 form1)
+        {
+            InitializeComponent();
+            parentForm = form1;
+            label7.Text = "Λογαριασμός: " + $"{bill}$";
+        }
+        private void Form2_Load(object sender, EventArgs e)
+        {
+
+        }
+
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            comboBox2.Items.Clear();
+
+            int currentHour = parentForm.simulatedTime.Hour;
+
+            if ((currentHour >= 6 && currentHour < 12) && comboBox1.SelectedItem.ToString() != "Πρωινό")
+            {
+                // Breakfast
+                MessageBox.Show("It's morning. We only have breakfast available.");
+                comboBox1.SelectedIndex = 0;
+            }
+            else if ((currentHour >= 12 && currentHour < 18) && comboBox1.SelectedItem.ToString() != "Μεσημεριανό")
+            {
+                // Lunch
+                MessageBox.Show("It's noun. We only have lunch available.");
+                comboBox1.SelectedIndex = 1;
+            }
+            else if ((currentHour >= 18 || currentHour < 6) && comboBox1.SelectedItem.ToString() != "Βραδινό")
+            {
+                // Dinner
+                MessageBox.Show("It's night. We only have dinner available.");
+                comboBox1.SelectedIndex = 2;
+            }
+
+
+            switch (comboBox1.SelectedItem.ToString())
+            {
+                case "Πρωινό":
+                    comboBox2.Items.AddRange(new string[] { "Τοστ", "Κρουασάν", "Ομελέτα" });
+                    break;
+                case "Μεσημεριανό":
+                    comboBox2.Items.AddRange(new string[] { "Μακαρόνια", "Κοτόπουλο", "Σαλάτα" });
+                    break;
+                case "Βραδινό":
+                    comboBox2.Items.AddRange(new string[] { "Σούπα", "Ψάρι", "Ρύζι" });
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
+        private bool selectionsMade = false;
+        private void button1_Click(object sender, EventArgs e)
+        {
+            // επαληθευσε οτι ολα ειναι συμπληρωμενα
+            if (comboBox1.SelectedItem == null || comboBox2.SelectedItem == null ||
+                comboBox3.SelectedItem == null || comboBox4.SelectedItem == null)
+            {
+                MessageBox.Show("Παρακαλώ επιλέξτε μία επιλογή από όλες τις λίστες.", "Σφάλμα", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // αποθηκευση δεδομένων
+            selectedMeal = comboBox1.SelectedItem.ToString();
+            selectedFood = comboBox2.SelectedItem.ToString();
+            selectedDrink = comboBox3.SelectedItem.ToString();
+            selectedCoffee = comboBox4.SelectedItem.ToString();
+            selectionsMade = true;
+
+            MessageBox.Show("Οι επιλογές σας αποθηκεύτηκαν με επιτυχία!", "Επιτυχία", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            Console.WriteLine($"Meal: {selectedMeal}, Food: {selectedFood}, Drink: {selectedDrink}, Coffee: {selectedCoffee}");
+
+            orderStatus = "Order Submitted";
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show($"Η κατάσταση της παραγγελίας σας είναι: {orderStatus}", "Κατάσταση Παραγγελίας", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (!selectionsMade)
+            {
+                MessageBox.Show("Παρακαλώ πατήστε το κουμπί 'Place Order' πριν προχωρήσετε στην πληρωμή.",
+                                "Σφάλμα", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            if (comboBox1.SelectedItem == null || comboBox2.SelectedItem == null ||
+                    comboBox3.SelectedItem == null || comboBox4.SelectedItem == null)
+            {
+                MessageBox.Show("Παρακαλώ επιλέξτε μία επιλογή από όλες τις λίστες πριν προχωρήσετε στην πληρωμή.",
+                                "Σφάλμα", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            DialogResult result = MessageBox.Show("Θέλετε να πληρώσετε τώρα ή να χρεώσετε στον λογαριασμό σας;",
+                                                  "Επιλογή Πληρωμής", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                MessageBox.Show("Η πληρωμή ολοκληρώθηκε επιτυχώς!", "Πληρωμή", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                orderStatus = "Order Payed";
+                bill = 0;
+                label7.Text = "Λογαριασμός: " + $"{bill}$";
+            }
+            else
+            {
+                MessageBox.Show($"Η παραγγελία προστέθηκε στον λογαριασμό σας. {label7.Text}", "Λογαριασμός Camper", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            ChatWindow chatWindow = new ChatWindow();
+            chatWindow.Show();
+        }
+
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            bill = bill + 10;
+            label7.Text = "Λογαριασμός: " + $"{bill}$";
+        }
+
+        private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            bill = bill + 5;
+            label7.Text = "Λογαριασμός: " + $"{bill}$";
+        }
+
+        private void comboBox4_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            bill = bill + 2;
+            label7.Text = "Λογαριασμός: " + $"{bill}$";
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                //οριζουμε την διαδρομη του αρχειου για το online help
+                string filePath = "Παραγγελία Φαγητού και Ροφημάτων.pdf";
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = filePath,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Δεν ήταν δυνατή η φόρτωση του αρχείου PDF. Σφάλμα: " + ex.Message, "Σφάλμα", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+    }
+    public partial class ChatWindow : Form
+    {
+        private System.Windows.Forms.Timer typingTimer;
+        private string pendingAnswer;
+        private TextBox chatDisplay;
+
+        public ChatWindow()
+        {
+            this.Text = "Chat with Employee";
+            this.Width = 400;
+            this.Height = 600;
+
+            chatDisplay = new TextBox
+            {
+                Multiline = true,
+                Dock = DockStyle.Top,
+                Height = 300,
+                ReadOnly = true,
+                ScrollBars = ScrollBars.Vertical
+            };
+            this.Controls.Add(chatDisplay);
+
+            Panel questionsPanel = new Panel
+            {
+                Dock = DockStyle.Bottom,
+                Width = 120,
+                AutoScroll = true
+            };
+            this.Controls.Add(questionsPanel);
+
+            string[] questions = {
+            "Ποια είναι η κατάσταση της παραγγελίας μου;",
+            "Ποιες είναι οι ώρες λειτουργίας σας;",
+            "Ποια είναι η πολιτική επιστροφής;",
+            "Πόσο κοστίζει ο καφές;",
+            "Μπορώ να προσθέσω την παραγγελία στον λογαριασμό μου;"
+        };
+
+            foreach (string question in questions)
+            {
+                Button questionButton = new Button
+                {
+                    Text = question,
+                    Dock = DockStyle.Top,
+                    Width = 100,
+                    Height = 30
+                };
+                questionButton.Click += (sender, e) =>
+                {
+                    chatDisplay.AppendText($"You: {question}\r\n");
+
+                    // Εμφάνιση "πληκτρολόγησης"
+                    chatDisplay.AppendText("Employee is typing...\r\n");
+
+                    pendingAnswer = GetAnswer(question);
+
+                    typingTimer = new System.Windows.Forms.Timer();
+                    typingTimer.Interval = 2000; // 2 δευτερόλεπτα
+                    typingTimer.Tick += TypingTimer_Tick;
+                    typingTimer.Start();
+                };
+                questionsPanel.Controls.Add(questionButton);
+            }
+        }
+
+        private void TypingTimer_Tick(object sender, EventArgs e)
+        {
+            typingTimer.Stop();
+
+            // Αφαίρεση του "Employee is typing..." από το chat
+            string chatContent = chatDisplay.Text;
+            int typingIndex = chatContent.LastIndexOf("Employee is typing...");
+            if (typingIndex >= 0)
+            {
+                chatContent = chatContent.Remove(typingIndex, "Employee is typing...\r\n".Length);
+                chatDisplay.Text = chatContent;
+
+                // Μετακίνηση του κέρσορα στο τέλος
+                chatDisplay.SelectionStart = chatDisplay.Text.Length;
+                chatDisplay.ScrollToCaret();
+            }
+
+            // Εμφάνιση της απάντησης
+            chatDisplay.AppendText($"Employee: {pendingAnswer}\r\n");
+            chatDisplay.SelectionStart = chatDisplay.Text.Length;
+            chatDisplay.ScrollToCaret();
+        }
+        private string GetAnswer(string question)
+        {
+            switch (question)
+            {
+                case "Ποια είναι η κατάσταση της παραγγελίας μου;":
+                    return "Η παραγγελία σας είναι σε επεξεργασία.";
+                case "Ποιες είναι οι ώρες λειτουργίας σας;":
+                    return "Είμαστε ανοιχτοί όλο το 24ωρο.";
+                case "Ποια είναι η πολιτική επιστροφής;":
+                    return "Μπορείτε να επιστρέψετε τα προϊόντα εντός 30 ημερών, εφόσον είναι αχρησιμοποίητα.";
+                case "Πόσο κοστίζει ο καφές;":
+                    return "Όλοι οι καφέδες κοστίζουν 2$.";
+                case "Μπορώ να προσθέσω την παραγγελία στον λογαριασμό μου;":
+                    return "Ναι, μπορείτε να προσθέσετε την παραγγελία στον λογαριασμό σας για πληρωμή αργότερα.";
+                default:
+                    return "Ευχαριστούμε για την ερώτησή σας!";
+            }
+        }
+    }
+}
