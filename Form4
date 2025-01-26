@@ -1,0 +1,261 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace Ergasia_Allilepidrasi
+{
+    public partial class Form4 : Form
+    {
+        private Form1 parentForm;
+        Bitmap blueDot;
+        Bitmap resizedBlueDot;
+        Bitmap mapImage;
+        bool goLeft, goRight, goUp, goDown;
+        int speed = 10;
+
+        int coordX;
+        int coordY;
+        int height;
+        int width;
+
+        int x;
+        int y;
+
+        public Form4(Form1 form1)
+        {
+            InitializeComponent();
+            parentForm = form1;
+            coordX = parentForm.coordX;
+            coordY = parentForm.coordY;
+            string selectedRegion = parentForm.selectedRegion;
+            label1.Text = "Για ασφάλεια κατευθυνθείτε προς την ακτή.";
+            this.KeyPreview = true;
+            mapImage = new Bitmap(Properties.Resources.map_new);
+            //pictureBox1.Image = mapImage;
+            blueDot = new Bitmap(Properties.Resources.blueDot);
+
+            for (int i = 0; i < blueDot.Width; i++)
+            {
+                for (int j = 0; j < blueDot.Height; j++)
+                {
+                    Color pixelColor = blueDot.GetPixel(i, j);
+
+                    if (pixelColor.R > 200 && pixelColor.G > 200 && pixelColor.B > 200)
+                    {
+                        blueDot.SetPixel(i, j, Color.FromArgb(0, pixelColor.R, pixelColor.G, pixelColor.B));
+                    }
+                }
+            }
+
+            int newWidth = blueDot.Width / 6;
+            int newHeight = blueDot.Height / 6;
+            resizedBlueDot = new Bitmap(blueDot, newWidth, newHeight);
+            height = resizedBlueDot.Height;
+            width = resizedBlueDot.Width;
+
+
+
+            x = coordX;
+            y = coordY;
+
+            if (selectedRegion == "Νησί")
+            {
+                y = coordY + 35;
+            }
+            else if (selectedRegion == "Ορεινό")
+            {
+                x = coordX - 39;
+                y = coordY - 35;
+            }
+            else if (selectedRegion == "Πεδινό")
+            {
+                x = coordX - 8;
+            }
+
+            /*
+            // Update the PictureBox to display the modified image
+            pictureBox1.Invalidate(); // Forces the PictureBox to repaint
+            pictureBox1.Refresh();  */
+        }
+
+
+        private int targetX;
+        private int targetY;
+        private int targetRange = 10;
+        private bool hasReachedTarget = false;
+        private void TimerEvent(object sender, EventArgs e)
+        {
+            if (hasReachedTarget) { return; }
+
+            int mapWidth = mapImage.Width;
+            int mapHeight = mapImage.Height;
+
+            if (goLeft && x > 0)
+            {
+                x -= speed;
+            }
+            if (goRight && x + width < mapWidth)
+            {
+                x += speed;
+            }
+            if (goUp && y > 0)
+            {
+                y -= speed;
+            }
+            if (goDown && y + height < mapHeight)
+            {
+                y += speed;
+            }
+
+            if ((x >= 200 && x <= 250) && (y >= 300 && y <= 340))
+            {
+                if (!hasReachedTarget)
+                {
+                    hasReachedTarget = true;
+                    MessageBox.Show("Congratulations! You've reached the target position.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    this.Close();
+                }
+            }
+
+            if ((x >= 250 && x <= 350) && (y >= 300 && y <= 330))
+            {
+                if (!hasReachedTarget)
+                {
+                    hasReachedTarget = true;
+                    MessageBox.Show("Congratulations! You've reached the target position.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    this.Close();
+                }
+            }
+            if ((x >= 100 && x <= 190) && (y >= 345 && y <= 364))
+            {
+                if (!hasReachedTarget)
+                {
+                    hasReachedTarget = true;
+                    MessageBox.Show("Congratulations! You've reached the target position.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    this.Close();
+                }
+            }
+
+            if ((x >= 86 && x <= 95) && (y >= 363 && y <= 416))
+            {
+                if (!hasReachedTarget)
+                {
+                    hasReachedTarget = true;
+                    MessageBox.Show("Congratulations! You've reached the target position.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    this.Close();
+                }
+            }
+
+            if ((x >= 37 && x <= 86) && (y >= 416 && y <= 425))
+            {
+                if (!hasReachedTarget)
+                {
+                    hasReachedTarget = true;
+                    MessageBox.Show("Congratulations! You've reached the target position.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    this.Close();
+                }
+            }
+
+            this.Invalidate();
+        }
+
+        private void KeyIsDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Left)
+            {
+                goLeft = true;
+            }
+            else if (e.KeyCode == Keys.Right)
+            {
+                goRight = true;
+            }
+            else if (e.KeyCode == Keys.Up)
+            {
+                goUp = true;
+            }
+            else if (e.KeyCode == Keys.Down)
+            {
+                goDown = true;
+            }
+        }
+
+        private void KeyIsUp(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                case Keys.Left:
+                    goLeft = false;
+                    break;
+                case Keys.Right:
+                    goRight = false;
+                    break;
+                case Keys.Up:
+                    goUp = false;
+                    break;
+                case Keys.Down:
+                    goDown = false;
+                    break;
+            }
+        }
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            switch (keyData)
+            {
+                case Keys.Left:
+                    goLeft = true;
+                    break;
+                case Keys.Right:
+                    goRight = true;
+                    break;
+                case Keys.Up:
+                    goUp = true;
+                    break;
+                case Keys.Down:
+                    goDown = true;
+                    break;
+            }
+
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private void FormPaintEvent(object sender, PaintEventArgs e)
+        {
+            Bitmap tempMapImage = new Bitmap(mapImage);
+
+            using (Graphics Canvas = Graphics.FromImage(tempMapImage))
+            {
+                Canvas.DrawImage(resizedBlueDot, x, y, width, height);
+            }
+            Point pictureBoxLocation = pictureBox1.Location;
+            Size pictureBoxSize = pictureBox1.ClientSize;
+            e.Graphics.DrawImage(tempMapImage, pictureBoxLocation.X, pictureBoxLocation.Y, pictureBoxSize.Width, pictureBoxSize.Height);
+
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                //οριζουμε την διαδρομη του αρχειου για το online help
+                string filePath = "Διαχείριση Climate Emergency.pdf";
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = filePath,
+                    UseShellExecute = true
+                });
+
+                this.Focus();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Δεν ήταν δυνατή η φόρτωση του αρχείου PDF. Σφάλμα: " + ex.Message, "Σφάλμα", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+    }
+}
